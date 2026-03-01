@@ -1,0 +1,32 @@
+/* Container for the 2D UI overlay */
+#hud-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    pointer-events: none; /* Allows clicking through to the VR scene */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.mission-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff3333;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    display: none; /* Hidden until mission starts */
+}
+
+.drone-counter {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+/* Styles for the "Enter VR" button customization */
+.a-enter-vr-button {
+    background-color: #ff0000 !important;
+    border-radius: 50% !important;
+}
