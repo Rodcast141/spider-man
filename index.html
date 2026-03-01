@@ -2,29 +2,37 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>WebXR Spidey: Drone Hunt</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Spider-Man: The One and Only Spider-Man Game VR</title>
     
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    
+    <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
     <script src="js/game.js"></script>
   </head>
   
   <body>
-    <a-scene environment="preset: Tron; dressingAmount: 0">
+    <a-scene environment="preset: neon; dressingAmount: 50; dressingColor: #0044ff">
       
-      <a-entity id="rig" position="0 15 0">
-        <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
-        
+      <a-entity id="rig" position="0 0 0">
+        <a-entity id="camera" camera look-controls position="0 1.6 0">
+          <a-cursor color="#f00"></a-cursor>
+        </a-entity>
         <a-entity id="right-hand" oculus-touch-controls="hand: right" 
                   spidey-controls
-                  raycaster="objects: .building, .suit, .enemy; far: 100"
-                  line="color: red; opacity: 0.5">
+                  raycaster="objects: .building, .menu-item; far: 100"
+                  line="color: #ff0000; opacity: 0.8">
         </a-entity>
       </a-entity>
 
-      <a-sky color="#87CEEB"></a-sky>
-      
-    </a-scene>
-  </body>
-</html>
+      <a-entity id="apartment">
+        <a-plane rotation="-90 0 0" width="10" height="10" color="#443322"></a-plane>
+        <a-plane position="0 4 0" rotation="90 0 0" width="10" height="10" color="#222"></a-plane>
+        <a-plane position="0 2 -5" width="10" height="4" color="#6b5344"></a-plane> <a-plane position="-5 2 0" rotation="0 90 0" width="10" height="4" color="#6b5344"></a-plane> <a-plane position="5 2 0" rotation="0 -90 0" width="10" height="4" color="#6b5344"></a-plane> <a-entity position="0 2 5">
+          <a-box position="-3.5 0 0" width="3" height="4" depth="0.1" color="#6b5344"></a-box>
+          <a-box position="3.5 0 0" width="3" height="4" depth="0.1" color="#6b5344"></a-box>
+          <a-box position="0 1.5 0" width="4" height="1" depth="0.1" color="#6b5344"></a-box>
+          <a-box position="0 -1.5 0" width="4" height="1" depth="0.1" color="#6b5344"></a-box>
+          <a-box position="0 0 0" width="4" height="2" depth="0.05" color="#88ccff" opacity="0.1"></a-box>
+        </a-entity>
+
+        <a-entity id="suit-gallery" position="0 1.5 -4.8">
+          <a-box class="menu-
