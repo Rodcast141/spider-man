@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>WebVR Spider-Man: Apartment Intro</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene environment="preset: city">
+      
+      <a-entity id="rig" position="0 0 0">
+        <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
+        
+        <a-entity id="right-hand" 
+                  laser-controls="hand: right" 
+                  raycaster="objects: .interactable, .building; far: 100"
+                  line="color: white; opacity: 0.5">
+          <a-sphere id="hand-visual" radius="0.05" color="#FFD1B3"></a-sphere>
+        </a-entity>
+      </a-entity>
+
+      <a-entity id="apartment" position="0 15 0">
+        <a-plane position="0 0 0" rotation="-90 0 0" width="10" height="10" color="#555"></a-plane>
+        <a-plane position="0 4 0" rotation="90 0 0" width="10" height="10" color="#ddd"></a-plane>
+        
+        <a-plane position="0 2 5" rotation="0 180 0" width="10" height="4" color="#888"></a-plane>
+        <a-plane position="-5 2 0" rotation="0 90 0" width="10" height="4" color="#888"></a-plane>
+        <a-plane position="5 2 0" rotation="0 -90 0" width="10" height="4" color="#888"></a-plane>
+        
+        <a-plane position="-3.5 2 -5" width="3" height="4" color="#888"></a-plane>
+        <a-plane position="3.5 2 -5" width="3" height="4" color="#888"></a-plane>
+        <a-plane position="0 3.5 -5" width="4" height="1" color="#888"></a-plane>
+        <a-plane position="0 0.5 -5" width="4" height="1" color="#888"></a-plane>
+
+        <a-box position="2 1 -2" width="2" height="1" depth="1" color="#3d2314"></a-box>
+        <a-box id="suit-pickup" class="interactable" position="2 1.6 -2" width="0.5" height="0.2" depth="0.5" color="#ff0000" animation="property: rotation; to
