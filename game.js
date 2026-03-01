@@ -1,97 +1,91 @@
 AFRAME.registerComponent('spidey-controls', {
-  schema: {
-    speed: { type: 'number', default: 0.1 },
-    gravity: { type: 'number', default: -0.015 },
-    swingForce: { type: 'number', default: 0.02 }
-  },
-
   init: function () {
+    // Each controller gets its own math data
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.isSwinging = false;
-    this.currentSuit = 'none'; // No suit at start
-    this.activeMission = 'none';
+    this.targetPoint = new THREE.Vector3();
+    this.currentSuit = 'none';
 
-    // Interaction Listeners
-    this.el.addEventListener('triggerdown', (e) => this.onTriggerDown(e));
-    this.el.addEventListener('triggerup', () => { this.isSwinging = false; });
-    
-    console.log("Spidey Systems Online: The One and Only Game VR");
-  },
+    // TRIGGER PRESSED (Shoot Web)
+    this.el.addEventListener('triggerdown', (e) => {
+      const raycaster = this.el.components.raycaster;
+      const intersections = raycaster.intersections;
 
-  onTriggerDown: function (evt) {
-    const raycaster = this.el.components.raycaster;
-    const intersections = raycaster.intersections;
+      if (intersections.length > 0) {
+        const target = intersections[0].el;
 
-    if (intersections.length > 0) {
-      const target = intersections[0].el;
+        // 1. Check if we are clicking a suit box in the apartment
+        if (target.classList.contains('menu-item')) {
+          this.currentSuit = target.id;
+          console.log("Suit Active: " + target.id);
+          return;
+        }
 
-      // --- SUIT SELECTION LOGIC ---
-      if (target.classList.contains('menu-item')) {
-        this.currentSuit = target.id;
-        this.equipSuit(target.id);
-        return;
+        // 2. Start swinging if we hit a building
+        if (target.classList.contains('building')) {
+          this.isSwinging = true;
+          this.targetPoint.copy(intersections[0].point);
+          // Play a web-shoot sound here if you have one!
+        }
       }
+    });
 
-      // --- SWINGING LOGIC (Only works if you have a suit!) ---
-      if (target.classList.contains('building') && this.currentSuit !== 'none') {
-        this.isSwinging = true;
-        this.targetPoint = intersections[0].point;
-        
-        // Visual Feedback for Web Line
-        this.el.setAttribute('line', {
-            start: {x: 0, y: 0, z: 0},
-            end: this.el.object3D.worldToLocal(this.targetPoint.clone()),
-            color: (this.currentSuit === 'hoodie-suit') ? '#ff0000' : '#ffffff',
-            opacity: 1
-        });
-      }
-    }
+    // TRIGGER RELEASED (Cut Web)
+    this.el.addEventListener('triggerup', () => {
+      this.isSwinging = false;
+    });
   },
 
-  equipSuit: function (suitId) {
-    const hand = this.el;
-    console.log("Equipping: " + suitId);
-    
-    if (suitId === 'hoodie-suit') {
-      // ITSV Mozzarella Look: Red Web
-      hand.setAttribute('line', 'color: #ff0000; opacity: 0.8');
-    } else if (suitId === 'insomniac-suit') {
-      // Insomniac Miles Look: White/Blue tech web
-      hand.setAttribute('line', 'color: #ffffff; opacity: 0.8');
-    } else if (suitId === 'collider-suit') {
-      // Collider Look: Glitchy electricity
-      hand.setAttribute('line', 'color: #ffff00; opacity: 0.9');
-    }
-  },
-
-  tick: function (time, timeDelta) {
+  tick: function (time, delta) {
     const rig = document.querySelector('#rig');
-    const pos = rig.object3D.position;
+    const dt = delta / 1000; // Convert to seconds
 
-    // 1. SWINGING PHYSICS
     if (this.isSwinging) {
-      const pull = new THREE.Vector3().subVectors(this.targetPoint, pos).normalize();
-      this.velocity.add(pull.multiplyScalar(this.data.swingForce));
+      // 1. Calculate the pull direction towards the web impact point
+      const rigPos = rig.object3D.position;
+      const pull = new THREE.Vector3().subVectors(this.targetPoint, rigPos).normalize();
       
-      // Update Web Line visual
-      const localTarget = this.el.object3D.worldToLocal(this.targetPoint.clone());
-      this.el.setAttribute('line', 'end', localTarget);
+      // 2. Apply "Swing Force"
+      this.velocity.add(pull.multiplyScalar(0.02));
+
+      // 3. Draw the Web Line (Visible Web)
+      this.el.setAttribute('line', {
+        start: {x: 0, y: 0, z: 0},
+        end: this.el.object3D.worldToLocal(this.targetPoint.clone()),
+        opacity: 1,
+        color: '#ffffff'
+      });
     } else {
-      // Hide line when not swinging
+      // Hide the web line when not swinging
       this.el.setAttribute('line', 'opacity: 0');
     }
 
-    // 2. GRAVITY & VELOCITY
-    this.velocity.y += this.data.gravity;
-    pos.add(this.velocity);
+    // 4. PHYSICS ENGINE (Gravity & Friction)
+    this.velocity.y -= 0.009; // Gravity
+    rig.object3D.position.add(this.velocity);
 
-    // 3. FLOOR COLLISION (So you don't fall forever)
-    if (pos.y < 0) {
-      pos.y = 0;
+    // Stop at the ground
+    if (rig.object3D.position.y < 0) {
+      rig.object3D.position.y = 0;
       this.velocity.set(0, 0, 0);
     }
 
-    // 4. AIR FRICTION (Slows you down slightly)
-    this.velocity.multiplyScalar(0.98);
+    // Air Friction (Slows you down so you don't fly forever)
+    this.velocity.multiplyScalar(0.99);
   }
 });
+
+// --- FAR FROM HOME LOADING SCREEN LOGIC ---
+window.addEventListener('load', () => {
+  const status = document.getElementById('status-text');
+  const startMenu = document.getElementById('start-menu');
+  const loader = document.getElementById('loading-screen');
+  const playBtn = document.getElementById('play-btn');
+
+  // Simulate EDITH Boot-up
+  setTimeout(() => { if(status) status.innerText = "ACCESSING STARK-NET..."; }, 1000);
+  setTimeout(() => { if(status) status.innerText = "RECOGNIZING BIOMETRICS..."; }, 2000);
+  setTimeout(() => { 
+    if(status) {
+      status.innerText = "WELCOME HOME, PETER."; 
+      status.style.color = "#00ff00    
