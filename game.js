@@ -8,7 +8,6 @@ AFRAME.registerComponent('spidey-controls', {
     init: function () {
         this.velocity = new THREE.Vector3(0, 0, 0);
         this.isSwinging = false;
-        <script src="js/game.js"></script>
         this.hasSuit = false;
         this.droneCount = 0;
 
